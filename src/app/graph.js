@@ -78,15 +78,6 @@ define([
         });
     };
 
-    GraphCreator.prototype.replaceSelectEdge = function(d3Path, edgeData) {
-        var thisGraph = this;
-        d3Path.classed(thisGraph.consts.selectedClass, true);
-        if (thisGraph.state.selectedEdge){
-            thisGraph.removeSelectFromEdge();
-        }
-        thisGraph.state.selectedEdge = edgeData;
-    };
-
     GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData){
         var thisGraph = this;
         d3Node.classed(this.consts.selectedClass, true);
@@ -102,32 +93,6 @@ define([
             return cd.id === thisGraph.state.selectedNode.id;
         }).classed(thisGraph.consts.selectedClass, false);
         thisGraph.state.selectedNode = null;
-    };
-
-    GraphCreator.prototype.removeSelectFromEdge = function(){
-        var thisGraph = this;
-        thisGraph.paths.filter(function(cd){
-            return cd === thisGraph.state.selectedEdge;
-        }).classed(thisGraph.consts.selectedClass, false);
-        thisGraph.state.selectedEdge = null;
-    };
-
-    GraphCreator.prototype.pathMouseDown = function(d3path, d){
-        var thisGraph = this,
-            state = thisGraph.state;
-        d3.event.stopPropagation();
-        state.mouseDownLink = d;
-
-        if (state.selectedNode){
-            thisGraph.removeSelectFromNode();
-        }
-
-        var prevEdge = state.selectedEdge;
-        if (!prevEdge || prevEdge !== d){
-            thisGraph.replaceSelectEdge(d3path, d);
-        } else{
-            thisGraph.removeSelectFromEdge();
-        }
     };
 
     // call to propagate changes to graph
@@ -147,35 +112,6 @@ define([
             .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
     };
 
-    /**** MAIN ****/
-    var bodyEl = document.getElementsByTagName('body')[0];
-
-    var width = window.innerWidth ||  bodyEl.clientWidth,
-        height =  window.innerHeight ||  bodyEl.clientHeight;
-
-    // initial node data
-    var nodes = [];
-    var edges = [];
-    for(var i = 0; i < 10; i++) {
-        for(var j = 0; j < 10; j++) {
-            nodes.push(
-                {title: "a", id: i * 10 + j, x: i * 40, y: j * 40}
-            );
-
-            if(j > 0) {
-                edges.push(
-                    {source: nodes[i * 10 + j - 1], target: nodes[i * 10 + j]}
-                )
-            }
-        }
-    }
-
-    /** MAIN SVG **/
-    var svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    var graph = new GraphCreator(svg, nodes, edges);
-    graph.updateGraph();
+    return GraphCreator;
 });
 

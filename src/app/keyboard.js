@@ -1,34 +1,12 @@
 define(["d3"], function(d3) {
 
-    function svgMouseDown(){
-        this.state.graphMouseDown = true;
-    }
-
-    function svgMouseUp(){
+    //todo move to dragend
+    function svgMouseUp() {
         var thisGraph = this,
             state = thisGraph.state;
-        if (state.justScaleTransGraph) {
-            // dragged not clicked
-            state.justScaleTransGraph = false;
-        } else if (state.graphMouseDown && d3.event.shiftKey){
-            // clicked not dragged from svg
-            var xycoords = d3.mouse(thisGraph.svgG.node()),
-                d = {id: thisGraph.idct++, title: "new concept", x: xycoords[0], y: xycoords[1]};
-            thisGraph.nodes.push(d);
-            thisGraph.updateGraph();
-            // make title of text immediently editable
-            var d3txt = thisGraph.changeTextOfNode(thisGraph.circles.filter(function(dval){
-                    return dval.id === d.id;
-                }), d),
-                txtNode = d3txt.node();
-            thisGraph.selectElementContents(txtNode);
-            txtNode.focus();
-        } else if (state.shiftNodeDrag){
-            // dragged from node
-            state.shiftNodeDrag = false;
+        if (state.shiftNodeDrag){
             thisGraph.dragLine.classed("hidden", true);
         }
-        state.graphMouseDown = false;
     }
 
     // keydown on main svg
@@ -36,8 +14,6 @@ define(["d3"], function(d3) {
         var thisGraph = this,
             state = thisGraph.state,
             consts = thisGraph.consts;
-        // make sure repeated key presses don't register for each keydown
-        if(state.lastKeyDown !== -1) return;
 
         state.lastKeyDown = d3.event.keyCode;
         var selectedNode = state.selectedNode,
@@ -61,14 +37,11 @@ define(["d3"], function(d3) {
         }
     }
 
-    function svgKeyUp() {
-        this.state.lastKeyDown = -1;
-    }
-
-    function circleMouseUp(d3node, d){
+    function circleMouseUp(d3node, d) {
         var thisGraph = this,
             state = thisGraph.state,
             consts = thisGraph.consts;
+
         // reset the states
         state.shiftNodeDrag = false;
         d3node.classed(consts.connectClass, false);
@@ -79,44 +52,31 @@ define(["d3"], function(d3) {
 
         thisGraph.dragLine.classed("hidden", true);
 
-        if (mouseDownNode !== d){
+        if (mouseDownNode !== d) {
             // we're in a different node: create new edge for mousedown edge and add to graph
             var newEdge = {source: mouseDownNode, target: d};
-            var filtRes = thisGraph.paths.filter(function(d){
+
+            var filtRes = thisGraph.paths.filter(function(d) {
                 if (d.source === newEdge.target && d.target === newEdge.source){
                     thisGraph.edges.splice(thisGraph.edges.indexOf(d), 1);
                 }
                 return d.source === newEdge.source && d.target === newEdge.target;
             });
+
             if (!filtRes[0].length){
                 thisGraph.edges.push(newEdge);
                 thisGraph.updateGraph();
             }
-        } else{
-            // we're in the same node
-            if (state.justDragged) {
-                // dragged, not clicked
-                state.justDragged = false;
-            } else{
-                // clicked, not dragged
-                if (d3.event.shiftKey){
-                    // shift-clicked node: edit text content
-                    var d3txt = thisGraph.changeTextOfNode(d3node, d);
-                    var txtNode = d3txt.node();
-                    thisGraph.selectElementContents(txtNode);
-                    txtNode.focus();
-                } else{
-                    if (state.selectedEdge){
-                        thisGraph.removeSelectFromEdge();
-                    }
-                    var prevNode = state.selectedNode;
+        } else {
+            if (state.selectedEdge){
+                thisGraph.removeSelectFromEdge();
+            }
+            var prevNode = state.selectedNode;
 
-                    if (!prevNode || prevNode.id !== d.id){
-                        thisGraph.replaceSelectNode(d3node, d);
-                    } else{
-                        thisGraph.removeSelectFromNode();
-                    }
-                }
+            if (!prevNode || prevNode.id !== d.id){
+                thisGraph.replaceSelectNode(d3node, d);
+            } else{
+                thisGraph.removeSelectFromNode();
             }
         }
         state.mouseDownNode = null;
@@ -139,10 +99,8 @@ define(["d3"], function(d3) {
     }
 
     return {
-        svgMouseDown: svgMouseDown,
         svgMouseUp: svgMouseUp,
         svgKeyDown: svgKeyDown,
-        svgKeyUp: svgKeyUp,
         circleMouseUp: circleMouseUp,
         circleMouseDown: circleMouseDown
     }

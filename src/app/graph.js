@@ -47,10 +47,7 @@ define([
         d3.select(window).on("keydown", function() {
             keyboard.svgKeyDown.call(thisGraph);
         })
-            .on("keyup", function(){
-                keyboard.svgKeyUp.call(thisGraph);
-            });
-        svg.on("mousedown", function(d){keyboard.svgMouseDown.call(thisGraph, d);});
+
         svg.on("mouseup", function(d){keyboard.svgMouseUp.call(thisGraph, d);});
 
         var dragSvg = zoom.getD3Zoom(thisGraph);

@@ -53,16 +53,9 @@ define([
         var dragSvg = zoom.getD3Zoom(thisGraph);
 
         svg.call(dragSvg).on("dblclick.zoom", null);
-
-        // listen for resize
-        window.onresize = function(){thisGraph.updateWindow(svg);};
     };
 
-    GraphCreator.prototype.setIdCt = function(idct){
-        this.idct = idct;
-    };
-
-    GraphCreator.prototype.consts  =  {
+    GraphCreator.prototype.consts = {
         selectedClass: "selected",
         connectClass: "connect-node",
         circleGClass: "conceptG",
@@ -154,16 +147,6 @@ define([
             .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
     };
 
-    GraphCreator.prototype.updateWindow = function(svg){
-        var docEl = document.documentElement,
-            bodyEl = document.getElementsByTagName('body')[0];
-        var x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-        var y = window.innerHeight|| docEl.clientHeight|| bodyEl.clientHeight;
-        svg.attr("width", x).attr("height", y);
-    };
-
-
-
     /**** MAIN ****/
     var bodyEl = document.getElementsByTagName('body')[0];
 
@@ -193,7 +176,6 @@ define([
         .attr("height", height);
 
     var graph = new GraphCreator(svg, nodes, edges);
-    graph.setIdCt(2);
     graph.updateGraph();
 });
 
